@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courier Express - Track</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+    }
+    header {
+      background: linear-gradient(to right, #007BFF, #00C6FF);
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .container {
+      margin: 20px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #007BFF;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .update-date {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #444;
+    }
+    .update-item {
+      border-left: 3px solid #007BFF;
+      margin: 10px 0;
+      padding-left: 10px;
+    }
+    .update-time {
+      color: #555;
+      font-size: 13px;
+    }
+    .update-status {
+      font-weight: bold;
+      color: #007BFF;
+    }
+    .update-location {
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>Courier Express</header>
+  <div class="container">
+    <h2>Track Your Parcel</h2>
+    <input type="text" id="trackingNumber" placeholder="Enter Tracking Number">
+    <button onclick="trackParcel()">Track</button>
+    <div id="trackingUpdates"></div>
+  </div>
+
+  <script>
+    function trackParcel() {
+      const input = document.getElementById("trackingNumber").value.trim();
+      const updatesBox = document.getElementById("trackingUpdates");
+      updatesBox.innerHTML = "";
+
+      if (input.startsWith("CEX")) {
+        // Load shipment details
+        const stored = localStorage.getItem(input);
+        if (stored) {
+          const shipment = JSON.parse(stored);
+          updatesBox.innerHTML += `
+            <div class="update-date">Shipment Details</div>
+            <div class="update-item">
+              <div class="update-status">Recipient: ${shipment.name}</div>
+              <div class="update-location">
+                ${shipment.address1}, ${shipment.address2 ? shipment.address2 + "," : ""} 
+                ${shipment.city}, ${shipment.state}, ${shipment.postal}, ${shipment.country}
+              </div>
+              <div class="update-location">Phone: ${shipment.phone}</div>
+              <div class="update-time">Created: ${shipment.createdAt}</div>
+            </div>
+          `;
+        }
+
+        // Tracking updates
+        const today = new Date();
+        const todayStr = today.toDateString();
+
+        const customUpdates = [
+          { date: todayStr, time: "09:00", status: "In Transit", location: "Courier Facility" },
+          { date: todayStr, time: "07:00", status: "Shipment on Hold Awaiting Custom Clearance", location: "Courier Facility" }
+        ];
+
+        showUpdates(customUpdates, updatesBox);
+      } else {
+        updatesBox.innerHTML = "<p>❌ Tracking number not found.</p>";
+        updatesBox.style.display = "block";
+      }
+    }
+
+    function showUpdates(updates, container) {
+      container.innerHTML += "<div class='update-date'>" + updates[0].date + "</div>";
+      updates.forEach(update => {
+        container.innerHTML += `
+          <div class="update-item">
+            <div class="update-time">${update.time} Local time</div>
+            <div class="update-status">${update.status}</div>
+            <div class="update-location">${update.location}</div>
+          </div>
+        `;
+      });
+      container.style.display = "block";
+    }
+  </script>
+</body>
+</html>

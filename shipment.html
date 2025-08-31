@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courier Express - Shipment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #007bff, #00c6ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      width: 420px;
+      overflow-y: auto;
+      max-height: 95vh;
+    }
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+    }
+    label {
+      font-size: 14px;
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+    .tracking-box {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #007bff;
+      word-break: break-word;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 8px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .footer {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Create Shipment</h2>
+    
+    <label for="name">Full Name</label>
+    <input type="text" id="name" placeholder="Enter full name">
+
+    <label for="company">Company (optional)</label>
+    <input type="text" id="company" placeholder="Company name">
+
+    <label for="country">Country</label>
+    <select id="country"><option value="">-- Select Country --</option></select>
+
+    <label for="address1">Address Line 1</label>
+    <input type="text" id="address1" placeholder="Street, house no.">
+
+    <label for="address2">Address Line 2 (optional)</label>
+    <input type="text" id="address2" placeholder="Apartment, suite, unit, etc.">
+
+    <label for="city">City</label>
+    <input type="text" id="city" placeholder="Enter city">
+
+    <label for="state">State / Province</label>
+    <input type="text" id="state" placeholder="Enter state">
+
+    <label for="postal">Postal Code</label>
+    <input type="text" id="postal" placeholder="Enter postal code">
+
+    <label for="phone">Phone Number</label>
+    <input type="text" id="phone" placeholder="Enter phone number">
+
+    <button onclick="generateTracking()">Generate Tracking Number</button>
+    <button id="copyBtn" onclick="copyTracking()" style="display:none;">Copy Tracking Number</button>
+
+    <div class="tracking-box" id="trackingNumber">No number generated yet</div>
+
+    <div class="footer">© 2025 Courier Express</div>
+  </div>
+
+  <script>
+    const countries = ["United States","United Kingdom","Canada","Germany","France","India","Nigeria","China","Japan","Australia","Brazil","Mexico","South Africa","Italy","Spain","Russia","Netherlands","Sweden","Norway","Denmark"];
+    const countrySelect = document.getElementById("country");
+    countries.forEach(country => {
+      let option = document.createElement("option");
+      option.value = country;
+      option.textContent = country;
+      countrySelect.appendChild(option);
+    });
+
+    let currentTracking = "";
+
+    function generateTracking() {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let randomPart = "";
+      for (let i = 0; i < 8; i++) {
+        randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      currentTracking = "CEX-" + new Date().getFullYear() + "-" + randomPart;
+
+      // Collect shipment details
+      const shipmentDetails = {
+        tracking: currentTracking,
+        name: document.getElementById("name").value,
+        company: document.getElementById("company").value,
+        country: document.getElementById("country").value,
+        address1: document.getElementById("address1").value,
+        address2: document.getElementById("address2").value,
+        city: document.getElementById("city").value,
+        state: document.getElementById("state").value,
+        postal: document.getElementById("postal").value,
+        phone: document.getElementById("phone").value,
+        createdAt: new Date().toLocaleString()
+      };
+
+      // Save to localStorage
+      localStorage.setItem(currentTracking, JSON.stringify(shipmentDetails));
+
+      document.getElementById("trackingNumber").innerText = "📦 " + currentTracking;
+      document.getElementById("copyBtn").style.display = "block";
+    }
+
+    function copyTracking() {
+      if (!currentTracking) return;
+      navigator.clipboard.writeText(currentTracking).then(() => {
+        alert("Tracking number copied: " + currentTracking);
+      });
+    }
+  </script>
+</body>
+</html>
